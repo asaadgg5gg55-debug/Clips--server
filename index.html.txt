@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كليبز</title>
+<style>
+:root{--bg:#fbf7f2;--fg:#1b1420;--card:#efe7de;--ac:#ff3d5a;--ac2:#ffb703;--mut:#7a6f78;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#140f18;--fg:#f6f0f4;--card:#241c2b;--mut:#a398a3}}
+:root[data-theme="dark"]{--bg:#140f18;--fg:#f6f0f4;--card:#241c2b;--mut:#a398a3}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:'Cairo','Segoe UI',Tahoma,sans-serif;overflow:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+#app{height:100%;display:flex;flex-direction:column}
+#main{flex:1;min-height:0;position:relative}
+.feed{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;background:#000;scrollbar-width:none}
+.feed::-webkit-scrollbar{display:none}
+.post{height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;background:#000;color:#fff}
+.post video,.demo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.demo{display:flex;align-items:center;justify-content:center;font-size:96px;background-size:300% 300%;animation:mv 7s ease infinite}
+@keyframes mv{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.shade{position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(0,0,0,.75));pointer-events:none}
+.info{position:absolute;right:14px;left:84px;bottom:18px;text-shadow:0 1px 6px #0009}
+.info b{font-size:17px}.info p{margin:6px 0 0;font-size:14px;line-height:1.5}
+.acts{position:absolute;left:10px;bottom:24px;display:flex;flex-direction:column;gap:16px;align-items:center}
+.acts button{color:#fff;display:flex;flex-direction:column;align-items:center;font-size:12px;gap:2px;text-shadow:0 1px 4px #0008}
+.acts i{font-style:normal;font-size:30px;line-height:1}
+.liked i{filter:drop-shadow(0 0 6px var(--ac))}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mut);text-align:center;padding:30px}
+.bar{padding:10px 12px;display:flex;gap:8px;align-items:center;background:var(--bg)}
+.bar input{margin:0}.bar .btn{width:auto;flex:none}.bar label.btn{flex:1}
+.split{display:flex;flex-direction:column;height:100%}
+.split .feed{flex:1;min-height:0;height:auto}.split .empty{flex:1;height:auto}
+nav{display:flex;align-items:center;justify-content:space-around;padding:8px 10px;background:var(--bg);border-top:1px solid var(--card)}
+nav button{padding:6px 8px;color:var(--mut);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:22px}
+nav button.on{color:var(--fg);font-weight:700}
+nav .plus{width:54px;height:38px;border-radius:12px;background:linear-gradient(90deg,var(--ac2),var(--ac));color:#fff;font-size:26px;font-weight:700;padding:0;display:flex;align-items:center;justify-content:center}
+.page{height:100%;overflow-y:auto;padding:22px 18px}
+.card{background:var(--card);border-radius:14px;padding:14px;margin:10px 0;display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),var(--ac));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex:none}
+.btn{background:var(--ac);color:#fff;border-radius:12px;padding:12px 18px;font-weight:700;width:100%}
+.btn.sec{background:var(--card);color:var(--fg)}
+input{width:100%;background:var(--card);border:2px solid transparent;border-radius:12px;padding:12px;margin:6px 0;outline:0}
+input:focus{border-color:var(--ac)}
+h1{font-size:30px;margin:0 0 4px}h2{margin:0 0 10px}
+.mut{color:var(--mut);font-size:14px}
+.auth{max-width:380px;margin:0 auto;padding-top:8vh}
+.sheet{position:fixed;inset:0;background:#0009;display:flex;align-items:flex-end;z-index:9}
+.sheet>div{background:var(--bg);width:100%;max-height:92%;overflow-y:auto;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;padding:10px;border-radius:10px;background:var(--card)}
+.tabs button.on{background:var(--fg);color:var(--bg);font-weight:700}
+.prev{position:relative;height:300px;border-radius:14px;overflow:hidden;background:#000;margin:10px 0;display:flex;align-items:center;justify-content:center;color:#aaa}
+.prev video{width:100%;height:100%;object-fit:contain}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
+.chips button{flex:none;padding:8px 14px;border-radius:20px;background:var(--card);font-size:13px}
+.chips button.on{background:var(--ac);color:#fff;font-weight:700}
+#toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:14px;z-index:20;display:none;max-width:90%}
+@media(prefers-reduced-motion:reduce){.demo{animation:none}}
+</style></head>
+<body>
+<div id="app"></div><div id="toast"></div>
+<script src="config.js"></script>
+<script>
+const F=[['none','أصلي',''],['bw','أبيض وأسود','grayscale(1)'],['sepia','سيبيا','sepia(.85)'],['warm','دافئ','sepia(.3) saturate(1.4) hue-rotate(-10deg)'],['cool','بارد','saturate(1.2) hue-rotate(18deg) brightness(1.05)'],['vivid','زاهي','saturate(1.9) contrast(1.1)'],['fade','باهت','contrast(.85) brightness(1.15) saturate(.8)'],['night','ليلي','brightness(.85) contrast(1.2) hue-rotate(200deg)']];
+const fcss=k=>(F.find(f=>f[0]===k)||F[0])[2];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem('clips_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('clips_'+k,JSON.stringify(v))}catch(e){}}};
+let users=ls.get('users',{}),cur=ls.get('cur',null),tab='home',muted=true,posts=[],urls={},draft=null,mem=[];
+const hash=s=>{let h=5381;for(const c of s)h=(h*33)^c.charCodeAt(0);return (h>>>0).toString(36)};
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)};
+/* api */
+const API=window.API_BASE||'';
+const nm=e=>(users[e]&&users[e].name)||e.split('@')[0];
+const src=p=>p.type==='file'?API+p.src:p.src;
+async function api(path,o={}){const h={};if(cur&&users[cur])h.Authorization='Bearer '+users[cur].token;if(o.json){h['Content-Type']='application/json';o.body=JSON.stringify(o.json)}
+ const r=await fetch(API+path,{method:o.method,body:o.body,headers:h});const d=await r.json().catch(()=>({}));
+ if(r.status===401&&cur){cur=null;ls.set('cur',null);render()}
+ if(!r.ok)throw new Error(d.error||'خطأ في الخادم');return d}
+const load=async()=>{try{posts=(await api('/api/videos')).videos}catch(e){posts=[];toast(e.message==='Failed to fetch'?'تعذر الاتصال بالخادم':e.message)}};
+/* views */
+const TABS=[['home','🏠','الرئيسية'],['phone','📱','الهاتف'],['cam'],['links','🔗','الروابط'],['me','👤','حسابي']];
+const list=sc=>posts.filter(p=>p.scope===sc);
+const chips=(act,sel)=>F.map(f=>`<button data-a="${act}" data-v="${f[0]}" class="${sel===f[0]?'on':''}">${f[1]}</button>`).join('');
+function render(){
+ const A=$('#app');stopCam();
+ if(!cur||!users[cur]){A.innerHTML=authView();return}
+ A.innerHTML='<div id="main"></div><nav>'+TABS.map(t=>t[0]==='cam'?'<button class="plus" data-a="tab" data-v="cam">+</button>':`<button data-a="tab" data-v="${t[0]}" class="${tab===t[0]?'on':''}"><i>${t[1]}</i>${t[2]}</button>`).join('')+'</nav>';
+ const m=$('#main');
+ if(tab==='home')m.innerHTML=feedView(list('pub'),'لا توجد فيديوهات بعد');
+ else if(tab==='phone'){m.innerHTML=`<div class="split"><div class="bar"><label class="btn" style="text-align:center;cursor:pointer">📱 اختر فيديوهات من هاتفك<input id="pfile" type="file" accept="video/*" multiple hidden></label></div>${feedView(list('phone'),'اختر فيديوهات من هاتفك لتظهر هنا، ثم اسحب لأعلى وأسفل بينها')}</div>`;$('#pfile').onchange=addPhone}
+ else if(tab==='links')m.innerHTML=`<div class="split"><div class="bar"><input id="lnk" type="url" dir="ltr" placeholder="الصق رابط فيديو مباشر (mp4 / webm)"><button class="btn" data-a="addlink">إضافة</button></div>${feedView(list('link'),'أضف روابط فيديو من الإنترنت لتظهر هنا')}</div>`;
+ else if(tab==='cam'){m.innerHTML=camView();camInit()}
+ else m.innerHTML=meView();
+ watch();
+}
+async function addPhone(){toast('جارٍ الرفع...');for(const f of $('#pfile').files){const fd=new FormData();fd.append('video',f);fd.append('scope','phone');fd.append('caption',f.name);try{await api('/api/videos',{method:'POST',body:fd})}catch(e){toast(e.message)}}await load();render();toast('تمت إضافة الفيديوهات')}
+function feedView(l,msg){
+ if(!l.length)return `<div class="empty"><div style="font-size:60px">🎬</div>${msg}</div>`;
+ return '<div class="feed" id="feed">'+l.map(postView).join('')+'</div>';
+}
+function authView(add){return `<div class="page"><div class="auth"><h1>🎬 كليبز</h1><p class="mut">${add?'أضف حساباً آخر':'سجّل الدخول لمشاهدة ونشر الفيديوهات'}</p>
+<input id="em" type="email" placeholder="البريد الإلكتروني" autocomplete="email" dir="ltr"><input id="pw" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" dir="ltr">
+<button class="btn" data-a="login" style="margin-top:10px">دخول</button><button class="btn sec" data-a="register" style="margin-top:8px">إنشاء حساب جديد</button>
+${Object.keys(users).length&&!add?'<p class="mut" style="margin-top:18px">حسابات محفوظة:</p>'+Object.keys(users).map(e=>`<div class="card" data-a="switch" data-v="${esc(e)}" style="cursor:pointer"><div class="av">${esc(nm(e)[0].toUpperCase())}</div><div><b>${esc(nm(e))}</b><div class="mut" dir="ltr">${esc(e)}</div></div></div>`).join(''):''}
+${add?'<button class="btn sec" data-a="cancel" style="margin-top:8px">إلغاء</button>':''}</div></div>`}
+function postView(p){
+ const liked=p.liked,m=p.type==='demo'?`<div class="demo" style="background:${p.bg};background-size:300% 300%;filter:${fcss(p.filter)}">${p.emoji}</div>`:`<video src="${esc(src(p))}" loop playsinline muted preload="metadata" style="filter:${fcss(p.filter)}"></video>`;
+ return `<section class="post" data-id="${p.id}">${m}<div class="shade"></div>
+<div class="info"><b>@${esc(p.ownerName)}</b><p>${esc(p.caption||'')}</p></div>
+<div class="acts"><button class="${liked?'liked':''}" data-a="like" data-v="${p.id}"><i>${liked?'❤️':'🤍'}</i>${p.likesCount}</button>
+<button data-a="filter" data-v="${p.id}"><i>🎨</i>فلتر</button>
+<button data-a="dl" data-v="${p.id}"><i>⬇️</i>تحميل</button>
+<button data-a="mute"><i>${muted?'🔇':'🔊'}</i>الصوت</button>
+${(p.scope||'pub')!=='pub'&&p.type!=='demo'?`<button data-a="pub" data-v="${p.id}"><i>📤</i>نشر</button>`:''}
+${p.mine?`<button data-a="del" data-v="${p.id}"><i>🗑️</i>حذف</button>`:''}</div></section>`;
+}
+function meView(){
+ const mine=posts.filter(p=>p.mine&&p.scope==='pub').length;
+ return `<div class="page"><h2>حسابي</h2><div class="card"><div class="av">${esc(nm(cur)[0].toUpperCase())}</div><div><b>${esc(nm(cur))}</b><div class="mut" dir="ltr">${esc(cur)}</div><div class="mut">${mine} فيديو</div></div></div>
+<h2 style="margin-top:22px">الحسابات على هذا الجهاز</h2>
+${Object.keys(users).map(e=>`<div class="card" data-a="switch" data-v="${esc(e)}" style="cursor:pointer"><div class="av">${esc(nm(e)[0].toUpperCase())}</div><div style="flex:1"><b>${esc(nm(e))}</b><div class="mut" dir="ltr">${esc(e)}</div></div>${e===cur?'<span>✅</span>':''}</div>`).join('')}
+<button class="btn sec" data-a="addacc" style="margin-top:8px">+ إضافة حساب آخر</button>
+<button class="btn" data-a="logout" style="margin-top:8px">تسجيل الخروج</button>
+<p class="mut" style="margin-top:18px">حسابك وفيديوهاتك محفوظة على الخادم.</p></div>`;
+}
+/* feed playback */
+function watch(){
+ const f=$('#feed');if(!f)return;
+ const io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');if(!v)return;if(e.isIntersecting){v.muted=muted;v.play().catch(()=>{})}else v.pause()}),{root:f,threshold:.7});
+ f.querySelectorAll('.post').forEach(s=>io.observe(s));
+ f.querySelectorAll('video').forEach(v=>v.onerror=()=>toast('تعذر تشغيل أحد الفيديوهات'));
+}
+/* camera page */
+let cam={stream:null,rec:null,chunks:[],blob:null,filter:'none'};
+function camView(){return `<div class="page"><h2>تصوير ونشر</h2><div class="prev" id="pv">افتح الكاميرا للتصوير</div>
+<div id="cb"><button class="btn" data-a="camopen">📷 فتح الكاميرا</button></div>
+<label class="btn sec" style="display:block;text-align:center;cursor:pointer;margin-top:8px">🎥 تصوير بتطبيق الكاميرا<input id="cf" type="file" accept="video/*" capture="user" hidden></label>
+<div class="mut" style="margin-top:14px">الفلتر</div><div class="chips">${chips('cfil','none')}</div>
+<input id="cap" placeholder="اكتب وصفاً للفيديو"><button class="btn" data-a="publish" style="margin-top:8px">نشر في الرئيسية</button><button class="btn sec" data-a="driveupload" style="margin-top:8px">☁️ رفع إلى Drive</button></div>`}
+function camInit(){cam={stream:null,rec:null,chunks:[],blob:null,filter:'none'};const f=$('#cf');f.onchange=()=>{if(f.files[0]){cam.blob=f.files[0];camPrev()}}}
+function camPrev(){$('#pv').innerHTML=`<video controls playsinline src="${URL.createObjectURL(cam.blob)}" style="filter:${fcss(cam.filter)}"></video>`}
+function stopCam(){try{if(cam.rec){cam.rec.onstop=null;if(cam.rec.state==='recording')cam.rec.stop()}if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop())}catch(e){}cam.stream=null}
+function closeSheet(){const s=$('#sheet');if(s)s.remove()}
+function filterSheet(id){
+ const p=posts.find(x=>x.id===id);const sh=document.createElement('div');sh.className='sheet';sh.id='sheet';
+ sh.innerHTML=`<div><h2>اختر فلتراً</h2><div class="chips" style="flex-wrap:wrap">${F.map(f=>`<button data-a="setf" data-id="${id}" data-v="${f[0]}" class="${p.filter===f[0]?'on':''}">${f[1]}</button>`).join('')}</div><button class="btn sec" data-a="close">تم</button></div>`;
+ document.body.appendChild(sh);
+}
+/* auth */
+async function auth(reg){
+ const e=$('#em').value.trim().toLowerCase(),p=$('#pw').value;
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))return toast('أدخل بريداً إلكترونياً صحيحاً');
+ if(reg&&p.length<6)return toast('كلمة المرور قصيرة (6 أحرف على الأقل)');
+ try{const d=await api(reg?'/api/register':'/api/login',{method:'POST',json:{email:e,password:p}});users[d.user.email]={name:d.user.name,token:d.token};ls.set('users',users);cur=d.user.email;ls.set('cur',cur);tab='home';await load();render()}
+ catch(x){toast(x.message==='Failed to fetch'?'تعذر الاتصال بالخادم':x.message)}
+}
+/* events */
+document.addEventListener('click',async ev=>{
+ const b=ev.target.closest('[data-a]');if(!b)return;
+ const a=b.dataset.a,v=b.dataset.v;
+ if(a==='login')auth(false);
+ else if(a==='register')auth(true);
+ else if(a==='switch'){cur=v;ls.set('cur',cur);tab='home';await load();render();toast('تم التبديل إلى '+nm(v))}
+ else if(a==='addacc'){cur=null;$('#app').innerHTML=authView(true)}
+ else if(a==='cancel'){cur=ls.get('cur',null);render()}
+ else if(a==='logout'){cur=null;ls.set('cur',null);render()}
+ else if(a==='tab'){tab=v;render()}
+ else if(a==='close')closeSheet();
+ else if(a==='addlink'){const u=$('#lnk').value.trim();if(!/^https?:\/\/\S+$/.test(u))return toast('أدخل رابطاً يبدأ بـ https://');try{await api('/api/videos',{method:'POST',json:{scope:'link',url:u,caption:u}});await load();render();toast('تمت إضافة الرابط')}catch(e){toast(e.message)}}
+ else if(a==='cfil'){cam.filter=v;document.querySelectorAll('[data-a=cfil]').forEach(x=>x.classList.toggle('on',x.dataset.v===v));const pv=$('#pv video');if(pv)pv.style.filter=fcss(v)}
+ else if(a==='camopen'){try{stopCam();cam.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});cam.blob=null;$('#pv').innerHTML=`<video id="lv" autoplay muted playsinline style="filter:${fcss(cam.filter)}"></video>`;$('#lv').srcObject=cam.stream;$('#cb').innerHTML='<button class="btn" data-a="rec">⏺ ابدأ التسجيل</button>'}catch(e){toast('تعذر فتح الكاميرا. استخدم زر «تصوير بتطبيق الكاميرا»')}}
+ else if(a==='rec'){try{
+  if(cam.rec&&cam.rec.state==='recording'){cam.rec.stop();return}
+  cam.chunks=[];cam.rec=new MediaRecorder(cam.stream);cam.rec.ondataavailable=e=>e.data.size&&cam.chunks.push(e.data);
+  cam.rec.onstop=()=>{cam.blob=new Blob(cam.chunks,{type:cam.rec.mimeType||'video/webm'});cam.stream.getTracks().forEach(t=>t.stop());camPrev();$('#cb').innerHTML='<button class="btn sec" data-a="camopen">🔄 إعادة التصوير</button>'};
+  cam.rec.start();b.textContent='⏹ إيقاف التسجيل'}catch(e){toast('التسجيل غير مدعوم هنا')}}
+ else if(a==='publish'){if(!cam.blob)return toast('صوّر فيديو أولاً');toast('جارٍ النشر...');const fd=new FormData();fd.append('video',cam.blob,'rec.webm');fd.append('scope','pub');fd.append('caption',$('#cap').value.trim());fd.append('filter',cam.filter);try{await api('/api/videos',{method:'POST',body:fd});cam.blob=null;await load();tab='home';render();toast('تم النشر')}catch(e){toast(e.message)}}
+ else if(a==='driveupload'){if(!cam.blob)return toast('ص\u0648\u0651ر فيديو أولاً');toast('جارٍ تجهيز المشاركة...');try{const file=cam.blob instanceof File?cam.blob:new File([cam.blob],'video.webm',{type:cam.blob.type||'video/webm'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'مشاركة فيديو'});toast('اختر Google Drive من قائمة المشاركة')}else toast('المشاركة غير مدعومة على هذا المتصفح')}catch(e){if(e.name!=='AbortError')toast('تعذرت المشاركة')}}}
+ else if(a==='pub'){try{await api('/api/videos/'+v,{method:'PATCH',json:{scope:'pub'}});await load();render();toast('تم النشر في الرئيسية')}catch(e){toast(e.message)}}
+ else if(a==='like'){try{const r=await api('/api/videos/'+v+'/like',{method:'POST'}),p=posts.find(x=>x.id===v);p.liked=r.liked;p.likesCount=r.likesCount;const st=$('#feed').scrollTop;render();$('#feed').scrollTop=st}catch(e){toast(e.message)}}
+ else if(a==='mute'){muted=!muted;document.querySelectorAll('video').forEach(x=>x.muted=muted);document.querySelectorAll('[data-a=mute] i').forEach(i=>i.textContent=muted?'🔇':'🔊')}
+ else if(a==='filter')filterSheet(v);
+ else if(a==='setf'){const p=posts.find(x=>x.id===b.dataset.id);p.filter=v;if(p.mine)api('/api/videos/'+p.id,{method:'PATCH',json:{filter:v}}).catch(()=>{});document.querySelectorAll('[data-a=setf]').forEach(x=>x.classList.toggle('on',x.dataset.v===v));const el=document.querySelector(`.post[data-id="${p.id}"] video`);if(el)el.style.filter=fcss(v)}
+ else if(a==='dl'){window.open(API+'/api/videos/'+v+'/download?t='+encodeURIComponent(users[cur].token),'_blank')}
+ else if(a==='del'){if(confirm('حذف هذا الفيديو؟')){try{await api('/api/videos/'+v,{method:'DELETE'})}catch(e){toast(e.message)}await load();render()}}
+});
+document.addEventListener('click',ev=>{const s=$('#sheet');if(s&&ev.target===s)closeSheet();const p=ev.target.closest('.post');if(p&&!ev.target.closest('[data-a]')){const vd=p.querySelector('video');if(vd)vd.paused?vd.play():vd.pause()}});
+(async()=>{if(cur&&users[cur])await load();render()})();
+</script></body></html>
